@@ -43,10 +43,12 @@
         <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
             <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Controles</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!--
                 <div>
                     <label for="csvFileInput" class="block mb-2 text-sm font-medium text-gray-700">Carregar novo arquivo CSV</label>
                     <input type="file" id="csvFileInput" accept=".csv" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
                 </div>
+                -->
                  <div>
                     <label for="dateFilter" class="block mb-2 text-sm font-medium text-gray-700">Filtrar por Data</label>
                     <select id="dateFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
@@ -55,12 +57,15 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Seção de Depuração -->
+
+        <!--
+        <-- Seção de Depuração -->
         <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">Registo de Depuração</h2>
             <textarea id="debug-log" readonly>Aguardando o carregamento do arquivo...</textarea>
         </div>
+        -->
+
 
         <!-- Seção dos Gráficos -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -142,7 +147,7 @@
             chartInstance: null
         },
         {
-            title: "ENFERMARIA INFANTIL (PEDIATRIA)",
+            title: "ENFERMARIA INFANTIL",
             canvasId: "enfermariaInfantilChart",
             susOcupKey: 'ped_sus_ocup', susExistKey: 'ped_sus_exist',
             partOcupKey: 'ped_part_ocup', partExistKey: 'ped_part_exist',
