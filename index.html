@@ -55,7 +55,7 @@
         </div>
 
         <!-- Seção de Depuração Oculta -->
-        <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+        <div class="bg-white p-6 rounded-2xl shadow-lg mb-8 hidden">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">Registo de Depuração</h2>
             <textarea id="debug-log" readonly>Aguardando o carregamento do arquivo...</textarea>
         </div>
@@ -74,12 +74,28 @@
                     <canvas id="utiInfantilChart"></canvas>
                 </div>
             </div>
+            
+            <!-- MODIFICAÇÃO INÍCIO: Gráfico de Enfermaria Adulto foi substituído pelos três abaixo -->
             <div class="bg-white p-6 rounded-2xl shadow-lg">
-                <h3 class="text-xl font-semibold text-gray-800 mb-3" id="title-enfermariaAdultoChart">ENFERMARIA ADULTO</h3>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3" id="title-enfermariaMedicaChart">ENFERMARIA - CLÍNICA MÉDICA</h3>
                 <div class="chart-container-medium">
-                    <canvas id="enfermariaAdultoChart"></canvas>
+                    <canvas id="enfermariaMedicaChart"></canvas>
                 </div>
             </div>
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h3 class="text-xl font-semibold text-gray-800 mb-3" id="title-enfermariaCirurgicaChart">ENFERMARIA - CLÍNICA CIRÚRGICA</h3>
+                <div class="chart-container-medium">
+                    <canvas id="enfermariaCirurgicaChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h3 class="text-xl font-semibold text-gray-800 mb-3" id="title-enfermariaGOChart">ENFERMARIA - GO/OBSTETRÍCIA</h3>
+                <div class="chart-container-medium">
+                    <canvas id="enfermariaGOChart"></canvas>
+                </div>
+            </div>
+            <!-- MODIFICAÇÃO FIM -->
+
             <div class="bg-white p-6 rounded-2xl shadow-lg">
                 <h3 class="text-xl font-semibold text-gray-800 mb-3" id="title-enfermariaInfantilChart">ENFERMARIA INFANTIL</h3>
                 <div class="chart-container-medium">
@@ -96,10 +112,34 @@
         DATE: 'datadopreenchimento',
     };
     const BED_TYPES_RAW_EXTRACTION = [
-        { key: 'enf_adulto_sus_ocup', col: 'informartotaldeocupacaonosleitossusnaclinicamedica', isAgregado: true, aggrKeys: ['informartotaldeocupacaonosleitossusnaclinicacirugica', 'informartotaldeocupacaodosleitossusnaginecologiaobstetricia'] },
-        { key: 'enf_adulto_sus_exist', col: 'informartotaldeleitossusnaclinicamedica', isAgregado: true, aggrKeys: ['informartotaldeleitossusnaclinicacirugica', 'informartotaldeleitossusnaginecologiaobstetricia'] },
-        { key: 'enf_adulto_conv_ocup', col: 'informartotaldeleitosocumapdosconveniosparticularnaclinicamedica', isAgregado: true, aggrKeys: ['informartotaldeocupacaonosleitosconveniosparticularnaclinicacirurgica', 'informartotaldeocupacaodeleitosconveniosparticularnaginecologiaobstetricia'] },
-        { key: 'enf_adulto_conv_exist', col: 'informartotaldeleitosconveniosparticularnaclinicamedica', isAgregado: true, aggrKeys: ['informartotaldeleitosconveniosparticularnaclinicacirurgica', 'informartotaldeleitosconveniosparticularnaginecologiaobstetricia'] },
+        // <-- MODIFICAÇÃO INÍCIO: As 4 linhas agregadas de ENF ADULTO foram removidas
+        // { key: 'enf_adulto_sus_ocup', col: 'informartotaldeocupacaonosleitossusnaclinicamedica', isAgregado: true, aggrKeys: ['informartotaldeocupacaonosleitossusnaclinicacirugica', 'informartotaldeocupacaodosleitossusnaginecologiaobstetricia'] },
+        // { key: 'enf_adulto_sus_exist', col: 'informartotaldeleitossusnaclinicamedica', isAgregado: true, aggrKeys: ['informartotaldeleitossusnaclinicacirugica', 'informartotaldeleitossusnaginecologiaobstetricia'] },
+        // { key: 'enf_adulto_conv_ocup', col: 'informartotaldeleitosocumapdosconveniosparticularnaclinicamedica', isAgregado: true, aggrKeys: ['informartotaldeocupacaonosleitosconveniosparticularnaclinicacirurgica', 'informartotaldeocupacaodeleitosconveniosparticularnaginecologiaobstetricia'] },
+        // { key: 'enf_adulto_conv_exist', col: 'informartotaldeleitosconveniosparticularnaclinicamedica', isAgregado: true, aggrKeys: ['informartotaldeleitosconveniosparticularnaclinicacirurgica', 'informartotaldeleitosconveniosparticularnaginecologiaobstetricia'] },
+        // <-- MODIFICAÇÃO FIM
+        
+        // <-- MODIFICAÇÃO INÍCIO: Adicionadas chaves separadas para cada tipo de enfermaria adulto
+        // 1. Clínica Médica
+        { key: 'enf_medica_sus_ocup', col: 'informartotaldeocupacaonosleitossusnaclinicamedica' },
+        { key: 'enf_medica_sus_exist', col: 'informartotaldeleitossusnaclinicamedica' },
+        { key: 'enf_medica_conv_ocup', col: 'informartotaldeleitosocumapdosconveniosparticularnaclinicamedica' },
+        { key: 'enf_medica_conv_exist', col: 'informartotaldeleitosconveniosparticularnaclinicamedica' },
+        
+        // 2. Clínica Cirúrgica
+        { key: 'enf_cirurgica_sus_ocup', col: 'informartotaldeocupacaonosleitossusnaclinicacirugica' },
+        { key: 'enf_cirurgica_sus_exist', col: 'informartotaldeleitossusnaclinicacirugica' },
+        { key: 'enf_cirurgica_conv_ocup', col: 'informartotaldeocupacaonosleitosconveniosparticularnaclinicacirurgica' },
+        { key: 'enf_cirurgica_conv_exist', col: 'informartotaldeleitosconveniosparticularnaclinicacirurgica' },
+
+        // 3. GO / Obstetrícia
+        { key: 'enf_go_sus_ocup', col: 'informartotaldeocupacaodosleitossusnaginecologiaobstetricia' },
+        { key: 'enf_go_sus_exist', col: 'informartotaldeleitossusnaginecologiaobstetricia' },
+        { key: 'enf_go_conv_ocup', col: 'informartotaldeocupacaodeleitosconveniosparticularnaginecologiaobstetricia' },
+        { key: 'enf_go_conv_exist', col: 'informartotaldeleitosconveniosparticularnaginecologiaobstetricia' },
+        // <-- MODIFICAÇÃO FIM
+
+        // Dados que já existiam e permanecem
         { key: 'uti_infantil_sus_ocup', col: 'informartotaldeocupacaodosleitosdeutineonatalsus', isAgregado: true, aggrKeys: ['informartotaldeocupacaodosleitosdeutipediatricasus'] },
         { key: 'uti_infantil_sus_exist', col: 'informartotaldeleitosdeutineonatalsus', isAgregado: true, aggrKeys: ['informartotaldeleitosdeutipediatricasus'] },
         { key: 'uti_infantil_conv_ocup', col: 'informartotaldeocupacaoleitosdeutineonatalconveniosparticular', isAgregado: true, aggrKeys: ['informartotaldeocupacaodosleitosdeutipediatricaconveniosparticular'] },
@@ -128,13 +168,38 @@
             partOcupKey: 'uti_infantil_conv_ocup', partExistKey: 'uti_infantil_conv_exist',
             chartInstance: null
         },
+        
+        // <-- MODIFICAÇÃO INÍCIO: Definição do gráfico único de ENF ADULTO removida e substituída por 3 novas
+        // {
+        //     title: "ENFERMARIA ADULTO",
+        //     canvasId: "enfermariaAdultoChart",
+        //     susOcupKey: 'enf_adulto_sus_ocup', susExistKey: 'enf_adulto_sus_exist',
+        //     partOcupKey: 'enf_adulto_conv_ocup', partExistKey: 'enf_adulto_conv_exist',
+        //     chartInstance: null
+        // },
         {
-            title: "ENFERMARIA ADULTO",
-            canvasId: "enfermariaAdultoChart",
-            susOcupKey: 'enf_adulto_sus_ocup', susExistKey: 'enf_adulto_sus_exist',
-            partOcupKey: 'enf_adulto_conv_ocup', partExistKey: 'enf_adulto_conv_exist',
+            title: "ENFERMARIA - CLÍNICA MÉDICA",
+            canvasId: "enfermariaMedicaChart",
+            susOcupKey: 'enf_medica_sus_ocup', susExistKey: 'enf_medica_sus_exist',
+            partOcupKey: 'enf_medica_conv_ocup', partExistKey: 'enf_medica_conv_exist',
             chartInstance: null
         },
+        {
+            title: "ENFERMARIA - CLÍNICA CIRÚRGICA",
+            canvasId: "enfermariaCirurgicaChart",
+            susOcupKey: 'enf_cirurgica_sus_ocup', susExistKey: 'enf_cirurgica_sus_exist',
+            partOcupKey: 'enf_cirurgica_conv_ocup', partExistKey: 'enf_cirurgica_conv_exist',
+            chartInstance: null
+        },
+        {
+            title: "ENFERMARIA - GO/OBSTETRÍCIA",
+            canvasId: "enfermariaGOChart",
+            susOcupKey: 'enf_go_sus_ocup', susExistKey: 'enf_go_sus_exist',
+            partOcupKey: 'enf_go_conv_ocup', partExistKey: 'enf_go_conv_exist',
+            chartInstance: null
+        },
+        // <-- MODIFICAÇÃO FIM
+
         {
             title: "ENFERMARIA INFANTIL",
             canvasId: "enfermariaInfantilChart",
@@ -171,7 +236,6 @@
     // --- FUNÇÕES DE ATUALIZAÇÃO DA UI ---
     function populateFilters(data) { const dates = [...new Set(data.map(item => item.displayDate))].sort((a,b) => parseDate(b) - parseDate(a)); dateFilter.innerHTML = '';  if (dates.length > 0) { dates.forEach(date => { dateFilter.innerHTML += `<option value="${date}">${date}</option>`; }); } else { dateFilter.innerHTML = '<option>Sem datas válidas</option>'; }}
     
-    // <-- MODIFICAÇÃO 1: A função updateCharts agora passa os dados brutos para os datasets.
     function updateCharts() { 
         const selectedDate = dateFilter.value; 
         if (!selectedDate || allData.length === 0) { 
@@ -223,8 +287,8 @@
                 return { 
                     label: instName, 
                     data: [susRate, partRate], 
-                    rawOcupados: [susOcup, partOcup],      // Adicionado
-                    rawExistentes: [susExist, partExist],  // Adicionado
+                    rawOcupados: [susOcup, partOcup],
+                    rawExistentes: [susExist, partExist],
                     backgroundColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length], 
                     borderColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length].replace('0.7', '1'), 
                     borderWidth: 1 
@@ -241,16 +305,27 @@
     }
     
     // --- INICIALIZAÇÃO ---
-    // <-- MODIFICAÇÃO 2: A função createCharts agora formata o tooltip com os dados brutos.
     function createCharts() { 
         CHART_DEFINITIONS.forEach(def => { 
-            const ctx = document.getElementById(def.canvasId).getContext('2d'); 
+            const canvas = document.getElementById(def.canvasId);
+            if (!canvas) {
+                console.error(`Elemento Canvas com ID "${def.canvasId}" não encontrado!`);
+                addToLog(`ERRO: Elemento Canvas com ID "${def.canvasId}" não encontrado! Verifique o HTML.`);
+                return;
+            }
+            const ctx = canvas.getContext('2d'); 
             def.chartInstance = new Chart(ctx, { 
                 type: 'bar', 
                 data: { labels: [], datasets: [] }, 
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
+                // AQUI COMEÇA A MODIFICAÇÃO IMPORTANTE
+                    interaction: {
+                        intersect: false, // O mouse não precisa cruzar (intersect) com a barra
+                        mode: 'index',    // O modo de interação é baseado no índice do eixo X
+                    },
+                // FIM DA MODIFICAÇÃO
                     scales: { 
                         y: { 
                             beginAtZero: true, 
@@ -265,20 +340,12 @@
                             callbacks: { 
                                 label: function(context) { 
                                     let label = context.dataset.label || ''; 
-                                    
-                                    if (label) { 
-                                        label += ': '; 
-                                    } 
-                                    if (context.parsed.y !== null) { 
-                                        label += context.parsed.y + '%'; 
-                                    }
-
+                                    if (label) { label += ': '; } 
+                                    if (context.parsed.y !== null) { label += context.parsed.y + '%'; }
                                     const index = context.dataIndex; 
                                     const ocupados = context.dataset.rawOcupados[index];
                                     const existentes = context.dataset.rawExistentes[index];
-
-                                    label += ` (TOTAL: ${existentes} - OCUPADOS: ${ocupados})`;
-
+                                    label += ` (Ocup: ${ocupados} de ${existentes})`;
                                     return label; 
                                 }
                             }
