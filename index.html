@@ -35,7 +35,7 @@
 
     <div class="container mx-auto p-4 md:p-8">
         <header class="mb-8 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Dashboard Comparativo de Ocupação</h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Dashboard - Ocupação de Leitos - DRS VIII</h1>
             <p class="text-md text-gray-600 mt-2">Comparação da ocupação das instituições para uma data específica.</p>
         </header>
 
@@ -317,7 +317,7 @@
                         x: {}
                     }, 
                     plugins: { 
-                        legend: { position: 'top', title: {display: true, text: 'Instituições'} }, 
+                        legend: { position: 'top', title: {display: false, text: 'Instituições'} }, 
                         // MODIFICADO: Tooltip agora usa a função getShortInstitutionName
                         tooltip: { 
                             callbacks: { 
@@ -338,7 +338,7 @@
                                 }
                             }
                         }, 
-                        title: { display: true, text: def.title }
+                        title: { display: false, text: def.title }
                     }
                 }
             });
