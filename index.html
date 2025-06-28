@@ -39,18 +39,15 @@
             <p class="text-md text-gray-600 mt-2">Comparação da ocupação das instituições para uma data específica.</p>
         </header>
 
-        <!-- Seção de Filtros -->
+        <!-- Seção de Filtros - MODIFICADO para alinhar à esquerda -->
         <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
             <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Filtrar por Data</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div></div>
-                <div class="md:col-span-1">
-                   <!-- <label for="dateFilter" class="block mb-2 text-sm font-medium text-gray-700">Filtrar por Data</label> -->
-                   <select id="dateFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                       <option>Carregando dados...</option>
-                   </select>
-               </div>
-               <div></div>
+            <div>
+                <div class="w-full md:w-1/3 lg:w-1/3">
+                    <select id="dateFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option>Carregando dados...</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -112,33 +109,21 @@
         DATE: 'datadopreenchimento',
     };
     const BED_TYPES_RAW_EXTRACTION = [
-        // <-- MODIFICAÇÃO INÍCIO: As 4 linhas agregadas de ENF ADULTO foram removidas
-        // { key: 'enf_adulto_sus_ocup', col: 'informartotaldeocupacaonosleitossusnaclinicamedica', isAgregado: true, aggrKeys: ['informartotaldeocupacaonosleitossusnaclinicacirugica', 'informartotaldeocupacaodosleitossusnaginecologiaobstetricia'] },
-        // { key: 'enf_adulto_sus_exist', col: 'informartotaldeleitossusnaclinicamedica', isAgregado: true, aggrKeys: ['informartotaldeleitossusnaclinicacirugica', 'informartotaldeleitossusnaginecologiaobstetricia'] },
-        // { key: 'enf_adulto_conv_ocup', col: 'informartotaldeleitosocumapdosconveniosparticularnaclinicamedica', isAgregado: true, aggrKeys: ['informartotaldeocupacaonosleitosconveniosparticularnaclinicacirurgica', 'informartotaldeocupacaodeleitosconveniosparticularnaginecologiaobstetricia'] },
-        // { key: 'enf_adulto_conv_exist', col: 'informartotaldeleitosconveniosparticularnaclinicamedica', isAgregado: true, aggrKeys: ['informartotaldeleitosconveniosparticularnaclinicacirurgica', 'informartotaldeleitosconveniosparticularnaginecologiaobstetricia'] },
-        // <-- MODIFICAÇÃO FIM
-        
-        // <-- MODIFICAÇÃO INÍCIO: Adicionadas chaves separadas para cada tipo de enfermaria adulto
         // 1. Clínica Médica
         { key: 'enf_medica_sus_ocup', col: 'informartotaldeocupacaonosleitossusnaclinicamedica' },
         { key: 'enf_medica_sus_exist', col: 'informartotaldeleitossusnaclinicamedica' },
         { key: 'enf_medica_conv_ocup', col: 'informartotaldeleitosocumapdosconveniosparticularnaclinicamedica' },
         { key: 'enf_medica_conv_exist', col: 'informartotaldeleitosconveniosparticularnaclinicamedica' },
-        
         // 2. Clínica Cirúrgica
         { key: 'enf_cirurgica_sus_ocup', col: 'informartotaldeocupacaonosleitossusnaclinicacirugica' },
         { key: 'enf_cirurgica_sus_exist', col: 'informartotaldeleitossusnaclinicacirugica' },
         { key: 'enf_cirurgica_conv_ocup', col: 'informartotaldeocupacaonosleitosconveniosparticularnaclinicacirurgica' },
         { key: 'enf_cirurgica_conv_exist', col: 'informartotaldeleitosconveniosparticularnaclinicacirurgica' },
-
         // 3. GO / Obstetrícia
         { key: 'enf_go_sus_ocup', col: 'informartotaldeocupacaodosleitossusnaginecologiaobstetricia' },
         { key: 'enf_go_sus_exist', col: 'informartotaldeleitossusnaginecologiaobstetricia' },
         { key: 'enf_go_conv_ocup', col: 'informartotaldeocupacaodeleitosconveniosparticularnaginecologiaobstetricia' },
         { key: 'enf_go_conv_exist', col: 'informartotaldeleitosconveniosparticularnaginecologiaobstetricia' },
-        // <-- MODIFICAÇÃO FIM
-
         // Dados que já existiam e permanecem
         { key: 'uti_infantil_sus_ocup', col: 'informartotaldeocupacaodosleitosdeutineonatalsus', isAgregado: true, aggrKeys: ['informartotaldeocupacaodosleitosdeutipediatricasus'] },
         { key: 'uti_infantil_sus_exist', col: 'informartotaldeleitosdeutineonatalsus', isAgregado: true, aggrKeys: ['informartotaldeleitosdeutipediatricasus'] },
@@ -168,15 +153,6 @@
             partOcupKey: 'uti_infantil_conv_ocup', partExistKey: 'uti_infantil_conv_exist',
             chartInstance: null
         },
-        
-        // <-- MODIFICAÇÃO INÍCIO: Definição do gráfico único de ENF ADULTO removida e substituída por 3 novas
-        // {
-        //     title: "ENFERMARIA ADULTO",
-        //     canvasId: "enfermariaAdultoChart",
-        //     susOcupKey: 'enf_adulto_sus_ocup', susExistKey: 'enf_adulto_sus_exist',
-        //     partOcupKey: 'enf_adulto_conv_ocup', partExistKey: 'enf_adulto_conv_exist',
-        //     chartInstance: null
-        // },
         {
             title: "ENFERMARIA - CLÍNICA MÉDICA",
             canvasId: "enfermariaMedicaChart",
@@ -198,8 +174,6 @@
             partOcupKey: 'enf_go_conv_ocup', partExistKey: 'enf_go_conv_exist',
             chartInstance: null
         },
-        // <-- MODIFICAÇÃO FIM
-
         {
             title: "ENFERMARIA INFANTIL",
             canvasId: "enfermariaInfantilChart",
@@ -229,6 +203,16 @@
     function addToLog(message) { logContent += message + '\n'; if (debugLog) debugLog.value = logContent; }
     function normalizeString(str) { if (!str) return ''; return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w]/g, '');}
     function normalizeInstitutionName(name) { if (!name) return ''; let normalized = name.toUpperCase().trim().replace(/Â/g, ''); normalized = normalized.replace(/MISERICÓRDIA/g, 'MISERICORDIA').replace(/SÃO/g, 'SAO').replace(/DE MISERICORDIA/g, '').trim(); if (normalized.includes('FRANCA')) return 'SANTA CASA DE FRANCA'; if (normalized.includes('ITUVERAVA')) return 'SANTA CASA DE ITUVERAVA'; if (normalized.includes('JOAQUIM DA BARRA')) return 'SANTA CASA DE SAO JOAQUIM DA BARRA'; return name; }
+    
+    // MODIFICADO: Função adicionada para encurtar nomes para o tooltip
+    function getShortInstitutionName(fullName) {
+        if (!fullName) return '';
+        if (fullName.includes('FRANCA')) return 'FRANCA';
+        if (fullName.includes('ITUVERAVA')) return 'ITUVERAVA';
+        if (fullName.includes('JOAQUIM DA BARRA')) return 'S.J. DA BARRA';
+        return fullName;
+    }
+    
     function parseDate(dateString) { if (!dateString || typeof dateString !== 'string') return null; const formattedDateString = dateString.replace(/[\.\-]/g, '/').trim(); const parts = formattedDateString.split('/'); if (parts.length === 3) { const day = parseInt(parts[0], 10); const month = parseInt(parts[1], 10); const year = parseInt(parts[2], 10); if (!isNaN(day) && !isNaN(month) && !isNaN(year) && year >= 2000 && year < 2100 && month >= 1 && month <= 12 && day >=1 && day <=31) { return new Date(year, month - 1, day);}} addToLog(`AVISO: Formato de data não reconhecido ou inválido: "${dateString}"`); return null;}
     function calculateRate(ocupados, existentes) { const numOcupados = parseInt(ocupados, 10) || 0; const numExistentes = parseInt(existentes, 10) || 0; if (numExistentes === 0) return 0; return Math.round((numOcupados / numExistentes) * 100); }
     function processData(normalizedCsvData) { let rejectedCount = 0; const processed = normalizedCsvData.map((row, index) => { const rawInstitution = row[COLS.INSTITUTION]; const institution = normalizeInstitutionName(rawInstitution); const date = parseDate(row[COLS.DATE]); if (!rawInstitution || !institution) { addToLog(`--> Linha ${index + 2} REJEITADA | Instituição: "${rawInstitution}"`); rejectedCount++; return null; } if (!date) { addToLog(`--> Linha ${index + 2} REJEITADA | Data inválida: "${row[COLS.DATE]}" para "${institution}"`); rejectedCount++; return null; } const dataPoint = { institution, date, displayDate: date.toLocaleDateString('pt-BR')}; BED_TYPES_RAW_EXTRACTION.forEach(def => { let total = parseInt(row[def.col], 10) || 0; if (def.isAgregado && def.aggrKeys) { def.aggrKeys.forEach(aggrKey => { total += (parseInt(row[aggrKey], 10) || 0); }); } dataPoint[def.key] = total; }); return dataPoint; }).filter(Boolean); addToLog(`\n--- RESUMO DO PROCESSAMENTO CSV ---\nLinhas Válidas: ${processed.length}\nLinhas Rejeitadas: ${rejectedCount}`); if (processed.length === 0 && normalizedCsvData.length > 0) { alert("Nenhum dado válido foi encontrado. Verifique o Registo de Depuração."); } return processed.sort((a, b) => a.date - b.date); }
@@ -320,12 +304,10 @@
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
-                // AQUI COMEÇA A MODIFICAÇÃO IMPORTANTE
                     interaction: {
-                        intersect: false, // O mouse não precisa cruzar (intersect) com a barra
-                        mode: 'index',    // O modo de interação é baseado no índice do eixo X
+                        intersect: false,
+                        mode: 'index',
                     },
-                // FIM DA MODIFICAÇÃO
                     scales: { 
                         y: { 
                             beginAtZero: true, 
@@ -336,15 +318,21 @@
                     }, 
                     plugins: { 
                         legend: { position: 'top', title: {display: true, text: 'Instituições'} }, 
+                        // MODIFICADO: Tooltip agora usa a função getShortInstitutionName
                         tooltip: { 
                             callbacks: { 
                                 label: function(context) { 
-                                    let label = context.dataset.label || ''; 
+                                    const originalLabel = context.dataset.label || '';
+                                    const shortLabel = getShortInstitutionName(originalLabel);
+                                    let label = shortLabel;
+                                    
                                     if (label) { label += ': '; } 
                                     if (context.parsed.y !== null) { label += context.parsed.y + '%'; }
+
                                     const index = context.dataIndex; 
                                     const ocupados = context.dataset.rawOcupados[index];
                                     const existentes = context.dataset.rawExistentes[index];
+                                    
                                     label += ` (Ocup: ${ocupados} de ${existentes})`;
                                     return label; 
                                 }
