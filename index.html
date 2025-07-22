@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Comparativo de Ocupação por Instituição</title>
+    <title>Dashboard - Ocupação de Leitos - DRS VIII</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -39,14 +39,53 @@
             <p class="text-md text-gray-600 mt-2">Comparação da ocupação das instituições para uma data específica.</p>
         </header>
 
-        <!-- Seção de Filtros - MODIFICADO para alinhar à esquerda -->
+        <!-- MODIFICADO: Seção de Filtros agora com dois modos -->
         <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+    
+            <!-- MODO 1: FILTRO COMPARATIVO POR DATA -->
             <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Filtrar por Data</h2>
+            <!-- <p class="text-sm text-gray-500 mb-4">Selecione uma data para comparar todas as instituições nesse dia.</p>-->
             <div>
-                <div class="w-full md:w-1/3 lg:w-1/3">
+                <div class="w-full md:w-1/3 lg:w-1/4">
                     <select id="dateFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        <option>Carregando dados...</option>
+                        <option value="">Selecione uma data...</option>
                     </select>
+                </div>
+            </div>
+        
+            <!-- Divisor -->
+            <hr class="my-8">
+        
+            <!-- MODO 2: FILTRO EVOLUTIVO POR INSTITUIÇÃO E PERÍODO -->
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Evolução da ocupação</h2>
+            <!-- <p class="text-sm text-gray-500 mb-4">Selecione uma ou mais instituições e um período para ver a evolução da ocupação.</p> -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                
+                <!-- Seletor de Instituição (Múltipla Escolha) -->
+                <div class="md:col-span-1">
+                    <label for="institutionFilter" class="block mb-2 text-sm font-medium text-gray-700">Instituições (segure Ctrl para selecionar mais de uma)</label>
+                    <select id="institutionFilter" multiple class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.0 h-14">
+                        <option>Carregando...</option>
+                    </select>
+                </div>
+                
+                <!-- Seletor de Período -->
+                <div class="md:col-span-1 grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="startDateFilter" class="block mb-2 text-sm font-medium text-gray-700">Data de Início</label>
+                        <input type="date" id="startDateFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    </div>
+                    <div>
+                        <label for="endDateFilter" class="block mb-2 text-sm font-medium text-gray-700">Data de Fim</label>
+                        <input type="date" id="endDateFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    </div>
+                </div>
+                
+                <!-- Botão para Aplicar o Filtro -->
+                <div class="md:col-span-1">
+                    <button id="applyEvolutionFilter" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                        Aplicar Filtro
+                    </button>
                 </div>
             </div>
         </div>
@@ -71,8 +110,6 @@
                     <canvas id="utiInfantilChart"></canvas>
                 </div>
             </div>
-            
-            <!-- MODIFICAÇÃO INÍCIO: Gráfico de Enfermaria Adulto foi substituído pelos três abaixo -->
             <div class="bg-white p-6 rounded-2xl shadow-lg">
                 <h3 class="text-xl font-semibold text-gray-800 mb-3" id="title-enfermariaMedicaChart">ENFERMARIA - CLÍNICA MÉDICA</h3>
                 <div class="chart-container-medium">
@@ -91,8 +128,6 @@
                     <canvas id="enfermariaGOChart"></canvas>
                 </div>
             </div>
-            <!-- MODIFICAÇÃO FIM -->
-
             <div class="bg-white p-6 rounded-2xl shadow-lg">
                 <h3 class="text-xl font-semibold text-gray-800 mb-3" id="title-enfermariaInfantilChart">ENFERMARIA INFANTIL</h3>
                 <div class="chart-container-medium">
@@ -109,22 +144,18 @@
         DATE: 'datadopreenchimento',
     };
     const BED_TYPES_RAW_EXTRACTION = [
-        // 1. Clínica Médica
         { key: 'enf_medica_sus_ocup', col: 'informartotaldeocupacaonosleitossusnaclinicamedica' },
         { key: 'enf_medica_sus_exist', col: 'informartotaldeleitossusnaclinicamedica' },
         { key: 'enf_medica_conv_ocup', col: 'informartotaldeleitosocumapdosconveniosparticularnaclinicamedica' },
         { key: 'enf_medica_conv_exist', col: 'informartotaldeleitosconveniosparticularnaclinicamedica' },
-        // 2. Clínica Cirúrgica
         { key: 'enf_cirurgica_sus_ocup', col: 'informartotaldeocupacaonosleitossusnaclinicacirugica' },
         { key: 'enf_cirurgica_sus_exist', col: 'informartotaldeleitossusnaclinicacirugica' },
         { key: 'enf_cirurgica_conv_ocup', col: 'informartotaldeocupacaonosleitosconveniosparticularnaclinicacirurgica' },
         { key: 'enf_cirurgica_conv_exist', col: 'informartotaldeleitosconveniosparticularnaclinicacirurgica' },
-        // 3. GO / Obstetrícia
         { key: 'enf_go_sus_ocup', col: 'informartotaldeocupacaodosleitossusnaginecologiaobstetricia' },
         { key: 'enf_go_sus_exist', col: 'informartotaldeleitossusnaginecologiaobstetricia' },
         { key: 'enf_go_conv_ocup', col: 'informartotaldeocupacaodeleitosconveniosparticularnaginecologiaobstetricia' },
         { key: 'enf_go_conv_exist', col: 'informartotaldeleitosconveniosparticularnaginecologiaobstetricia' },
-        // Dados que já existiam e permanecem
         { key: 'uti_infantil_sus_ocup', col: 'informartotaldeocupacaodosleitosdeutineonatalsus', isAgregado: true, aggrKeys: ['informartotaldeocupacaodosleitosdeutipediatricasus'] },
         { key: 'uti_infantil_sus_exist', col: 'informartotaldeleitosdeutineonatalsus', isAgregado: true, aggrKeys: ['informartotaldeleitosdeutipediatricasus'] },
         { key: 'uti_infantil_conv_ocup', col: 'informartotaldeocupacaoleitosdeutineonatalconveniosparticular', isAgregado: true, aggrKeys: ['informartotaldeocupacaodosleitosdeutipediatricaconveniosparticular'] },
@@ -194,6 +225,11 @@
     // --- ELEMENTOS DO DOM ---
     const dateFilter = document.getElementById('dateFilter');
     const debugLog = document.getElementById('debug-log');
+    // MODIFICADO: Novos elementos
+    const institutionFilter = document.getElementById('institutionFilter');
+    const startDateFilter = document.getElementById('startDateFilter');
+    const endDateFilter = document.getElementById('endDateFilter');
+    const applyEvolutionFilter = document.getElementById('applyEvolutionFilter');
 
     // --- VARIÁVEIS GLOBAIS ---
     let allData = [];
@@ -203,49 +239,65 @@
     function addToLog(message) { logContent += message + '\n'; if (debugLog) debugLog.value = logContent; }
     function normalizeString(str) { if (!str) return ''; return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w]/g, '');}
     function normalizeInstitutionName(name) { if (!name) return ''; let normalized = name.toUpperCase().trim().replace(/Â/g, ''); normalized = normalized.replace(/MISERICÓRDIA/g, 'MISERICORDIA').replace(/SÃO/g, 'SAO').replace(/DE MISERICORDIA/g, '').trim(); if (normalized.includes('FRANCA')) return 'SANTA CASA DE FRANCA'; if (normalized.includes('ITUVERAVA')) return 'SANTA CASA DE ITUVERAVA'; if (normalized.includes('JOAQUIM DA BARRA')) return 'SANTA CASA DE SAO JOAQUIM DA BARRA'; return name; }
-    
-    // MODIFICADO: Função adicionada para encurtar nomes para o tooltip
-    function getShortInstitutionName(fullName) {
-        if (!fullName) return '';
-        if (fullName.includes('FRANCA')) return 'FRANCA';
-        if (fullName.includes('ITUVERAVA')) return 'ITUVERAVA';
-        if (fullName.includes('JOAQUIM DA BARRA')) return 'S.J. DA BARRA';
-        return fullName;
-    }
-    
+    function getShortInstitutionName(fullName) { if (!fullName) return ''; if (fullName.includes('FRANCA')) return 'FRANCA'; if (fullName.includes('ITUVERAVA')) return 'ITUVERAVA'; if (fullName.includes('JOAQUIM DA BARRA')) return 'S.J. DA BARRA'; return fullName; }
     function parseDate(dateString) { if (!dateString || typeof dateString !== 'string') return null; const formattedDateString = dateString.replace(/[\.\-]/g, '/').trim(); const parts = formattedDateString.split('/'); if (parts.length === 3) { const day = parseInt(parts[0], 10); const month = parseInt(parts[1], 10); const year = parseInt(parts[2], 10); if (!isNaN(day) && !isNaN(month) && !isNaN(year) && year >= 2000 && year < 2100 && month >= 1 && month <= 12 && day >=1 && day <=31) { return new Date(year, month - 1, day);}} addToLog(`AVISO: Formato de data não reconhecido ou inválido: "${dateString}"`); return null;}
     function calculateRate(ocupados, existentes) { const numOcupados = parseInt(ocupados, 10) || 0; const numExistentes = parseInt(existentes, 10) || 0; if (numExistentes === 0) return 0; return Math.round((numOcupados / numExistentes) * 100); }
     function processData(normalizedCsvData) { let rejectedCount = 0; const processed = normalizedCsvData.map((row, index) => { const rawInstitution = row[COLS.INSTITUTION]; const institution = normalizeInstitutionName(rawInstitution); const date = parseDate(row[COLS.DATE]); if (!rawInstitution || !institution) { addToLog(`--> Linha ${index + 2} REJEITADA | Instituição: "${rawInstitution}"`); rejectedCount++; return null; } if (!date) { addToLog(`--> Linha ${index + 2} REJEITADA | Data inválida: "${row[COLS.DATE]}" para "${institution}"`); rejectedCount++; return null; } const dataPoint = { institution, date, displayDate: date.toLocaleDateString('pt-BR')}; BED_TYPES_RAW_EXTRACTION.forEach(def => { let total = parseInt(row[def.col], 10) || 0; if (def.isAgregado && def.aggrKeys) { def.aggrKeys.forEach(aggrKey => { total += (parseInt(row[aggrKey], 10) || 0); }); } dataPoint[def.key] = total; }); return dataPoint; }).filter(Boolean); addToLog(`\n--- RESUMO DO PROCESSAMENTO CSV ---\nLinhas Válidas: ${processed.length}\nLinhas Rejeitadas: ${rejectedCount}`); if (processed.length === 0 && normalizedCsvData.length > 0) { alert("Nenhum dado válido foi encontrado. Verifique o Registo de Depuração."); } return processed.sort((a, b) => a.date - b.date); }
 
     // --- FUNÇÕES DE ATUALIZAÇÃO DA UI ---
-    function populateFilters(data) { const dates = [...new Set(data.map(item => item.displayDate))].sort((a,b) => parseDate(b) - parseDate(a)); dateFilter.innerHTML = '';  if (dates.length > 0) { dates.forEach(date => { dateFilter.innerHTML += `<option value="${date}">${date}</option>`; }); } else { dateFilter.innerHTML = '<option>Sem datas válidas</option>'; }}
+    // MODIFICADO: Agora popula todos os filtros
+    function populateFilters(data) {
+        const dates = [...new Set(data.map(item => item.displayDate))].sort((a,b) => parseDate(b) - parseDate(a));
+        dateFilter.innerHTML = '<option value="">Selecione uma data...</option>'; 
+        if (dates.length > 0) {
+            dates.forEach(date => { dateFilter.innerHTML += `<option value="${date}">${date}</option>`; });
+        } else {
+            dateFilter.innerHTML = '<option>Sem datas válidas</option>';
+        }
+
+        const institutions = [...new Set(data.map(item => item.institution))].sort();
+        institutionFilter.innerHTML = '';
+        if (institutions.length > 0) {
+            institutions.forEach(inst => { institutionFilter.innerHTML += `<option value="${inst}">${inst}</option>`; });
+        } else {
+            institutionFilter.innerHTML = '<option>Sem instituições</option>';
+        }
+
+        if (data.length > 0) {
+            const firstDate = data[0].date;
+            const lastDate = data[data.length - 1].date;
+            const formatDateForInput = (date) => date.toISOString().split('T')[0];
+
+            startDateFilter.min = formatDateForInput(firstDate);
+            startDateFilter.max = formatDateForInput(lastDate);
+            endDateFilter.min = formatDateForInput(firstDate);
+            endDateFilter.max = formatDateForInput(lastDate);
+            startDateFilter.value = formatDateForInput(firstDate);
+            endDateFilter.value = formatDateForInput(lastDate);
+        }
+    }
     
-    function updateCharts() { 
-        const selectedDate = dateFilter.value; 
+    // MODIFICADO: Renomeado de updateCharts para updateChartsComparative
+    function updateChartsComparative() { 
+        const selectedDate = dateFilter.value;
+        
+        if (selectedDate) {
+            institutionFilter.selectedIndex = -1;
+        }
+
         if (!selectedDate || allData.length === 0) { 
             CHART_DEFINITIONS.forEach(def => { 
                 if (def.chartInstance) { 
+                    def.chartInstance.config.type = 'bar';
                     def.chartInstance.data.labels = []; 
                     def.chartInstance.data.datasets = []; 
                     def.chartInstance.update(); 
-                    document.getElementById(`title-${def.canvasId}`).textContent = `${def.title} (Selecione uma data)`; 
+                    document.getElementById(`title-${def.canvasId}`).textContent = `${def.title} (Selecione um modo de filtro)`; 
                 }
             }); 
             return; 
         } 
         const dataForDate = allData.filter(d => d.displayDate === selectedDate); 
-        if (dataForDate.length === 0) { 
-            addToLog(`Nenhum dado encontrado para a data ${selectedDate}.`); 
-            CHART_DEFINITIONS.forEach(def => { 
-                if (def.chartInstance) { 
-                    def.chartInstance.data.labels = []; 
-                    def.chartInstance.data.datasets = []; 
-                    def.chartInstance.update(); 
-                    document.getElementById(`title-${def.canvasId}`).textContent = `${def.title} (Sem dados para ${selectedDate})`; 
-                }
-            }); 
-            return; 
-        } 
         const institutionsOnDate = [...new Set(dataForDate.map(d => d.institution))].sort(); 
         
         CHART_DEFINITIONS.forEach(chartDef => { 
@@ -253,26 +305,15 @@
             
             const datasets = institutionsOnDate.map((instName, index) => { 
                 const instData = dataForDate.find(d => d.institution === instName);
-                
-                let susRate = 0, partRate = 0;
-                let susOcup = 0, susExist = 0;
-                let partOcup = 0, partExist = 0;
-
+                let susRate = 0, partRate = 0, susOcup = 0, susExist = 0, partOcup = 0, partExist = 0;
                 if (instData) {
-                    susOcup = instData[chartDef.susOcupKey] || 0;
-                    susExist = instData[chartDef.susExistKey] || 0;
-                    partOcup = instData[chartDef.partOcupKey] || 0;
-                    partExist = instData[chartDef.partExistKey] || 0;
-                    
-                    susRate = calculateRate(susOcup, susExist);
-                    partRate = calculateRate(partOcup, partExist);
+                    susOcup = instData[chartDef.susOcupKey] || 0; susExist = instData[chartDef.susExistKey] || 0;
+                    partOcup = instData[chartDef.partOcupKey] || 0; partExist = instData[chartDef.partExistKey] || 0;
+                    susRate = calculateRate(susOcup, susExist); partRate = calculateRate(partOcup, partExist);
                 }
-
                 return { 
-                    label: instName, 
-                    data: [susRate, partRate], 
-                    rawOcupados: [susOcup, partOcup],
-                    rawExistentes: [susExist, partExist],
+                    label: instName, data: [susRate, partRate], 
+                    rawOcupados: [susOcup, partOcup], rawExistentes: [susExist, partExist],
                     backgroundColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length], 
                     borderColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length].replace('0.7', '1'), 
                     borderWidth: 1 
@@ -280,10 +321,71 @@
             }); 
             
             if (chartDef.chartInstance) { 
+                chartDef.chartInstance.config.type = 'bar'; // Garante tipo BARRA
                 chartDef.chartInstance.data.labels = ['SUS', 'Convênio/Particular']; 
                 chartDef.chartInstance.data.datasets = datasets; 
-                chartDef.chartInstance.options.plugins.title.text = `${chartDef.title} - ${selectedDate}`; 
+                chartDef.chartInstance.options.scales.x.title.text = 'Tipo de Leito';
                 chartDef.chartInstance.update(); 
+            }
+        });
+    }
+
+    // NOVO: Função para o modo de evolução
+    function updateChartsEvolution() {
+        const selectedInstitutions = Array.from(institutionFilter.selectedOptions).map(option => option.value);
+        const startDate = startDateFilter.valueAsDate;
+        const endDate = endDateFilter.valueAsDate;
+
+        if (selectedInstitutions.length === 0 || !startDate || !endDate) {
+            alert("Por favor, selecione pelo menos uma instituição e um período válido.");
+            return;
+        }
+        
+        dateFilter.value = "";
+        
+        const offset = startDate.getTimezoneOffset();
+        const adjustedStartDate = new Date(startDate.getTime() + offset*60*1000);
+        const adjustedEndDate = new Date(endDate.getTime() + offset*60*1000);
+
+        const filteredData = allData.filter(d => {
+            return d.date >= adjustedStartDate && d.date <= adjustedEndDate && selectedInstitutions.includes(d.institution);
+        });
+
+        if (filteredData.length === 0) {
+            alert("Nenhum dado encontrado para os filtros selecionados.");
+            return;
+        }
+
+        const labels = [...new Set(filteredData.map(d => d.displayDate))].sort((a, b) => parseDate(a) - parseDate(b));
+
+        CHART_DEFINITIONS.forEach(chartDef => {
+            document.getElementById(`title-${chartDef.canvasId}`).textContent = `${chartDef.title} - Evolução`;
+            
+            const datasets = selectedInstitutions.map((instName, index) => {
+                const dataForInstitution = filteredData.filter(d => d.institution === instName);
+                const dataPoints = labels.map(labelDate => {
+                    const dayData = dataForInstitution.find(d => d.displayDate === labelDate);
+                    if (!dayData) return null;
+                    const totalOcup = (dayData[chartDef.susOcupKey] || 0) + (dayData[chartDef.partOcupKey] || 0);
+                    const totalExist = (dayData[chartDef.susExistKey] || 0) + (dayData[chartDef.partExistKey] || 0);
+                    return calculateRate(totalOcup, totalExist);
+                });
+
+                return {
+                    label: getShortInstitutionName(instName),
+                    data: dataPoints,
+                    borderColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length],
+                    backgroundColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length].replace('0.7', '0.2'),
+                    fill: false, tension: 0.1, spanGaps: true,
+                };
+            });
+
+            if (chartDef.chartInstance) {
+                chartDef.chartInstance.config.type = 'line'; // Muda para tipo LINHA
+                chartDef.chartInstance.data.labels = labels;
+                chartDef.chartInstance.data.datasets = datasets;
+                chartDef.chartInstance.options.scales.x.title.text = 'Data';
+                chartDef.chartInstance.update();
             }
         });
     }
@@ -292,49 +394,36 @@
     function createCharts() { 
         CHART_DEFINITIONS.forEach(def => { 
             const canvas = document.getElementById(def.canvasId);
-            if (!canvas) {
-                console.error(`Elemento Canvas com ID "${def.canvasId}" não encontrado!`);
-                addToLog(`ERRO: Elemento Canvas com ID "${def.canvasId}" não encontrado! Verifique o HTML.`);
-                return;
-            }
+            if (!canvas) { console.error(`Canvas "${def.canvasId}" não encontrado!`); return; }
             const ctx = canvas.getContext('2d'); 
             def.chartInstance = new Chart(ctx, { 
                 type: 'bar', 
                 data: { labels: [], datasets: [] }, 
                 options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    interaction: {
-                        intersect: false,
-                        mode: 'index',
-                    },
+                    responsive: true, maintainAspectRatio: false, 
+                    interaction: { intersect: false, mode: 'index' },
                     scales: { 
-                        y: { 
-                            beginAtZero: true, 
-                            
-                            title: { display: true, text: 'Ocupação (%)' } 
-                        }, 
-                        x: {}
+                        y: { beginAtZero: true, title: { display: true, text: 'Ocupação (%)' } }, 
+                        x: { title: { display: true, text: 'Tipo de Leito' } }
                     }, 
                     plugins: { 
                         legend: { position: 'top', title: {display: false, text: 'Instituições'} }, 
-                        // MODIFICADO: Tooltip agora usa a função getShortInstitutionName
                         tooltip: { 
                             callbacks: { 
                                 label: function(context) { 
-                                    const originalLabel = context.dataset.label || '';
-                                    const shortLabel = getShortInstitutionName(originalLabel);
-                                    let label = shortLabel;
-                                    
-                                    if (label) { label += ': '; } 
-                                    if (context.parsed.y !== null) { label += context.parsed.y + '%'; }
-
-                                    const index = context.dataIndex; 
-                                    const ocupados = context.dataset.rawOcupados[index];
-                                    const existentes = context.dataset.rawExistentes[index];
-                                    
-                                    label += ` (Ocup: ${ocupados} de ${existentes})`;
-                                    return label; 
+                                    if (context.chart.config.type === 'bar') {
+                                        const originalLabel = context.dataset.label || '';
+                                        const shortLabel = getShortInstitutionName(originalLabel);
+                                        let label = shortLabel;
+                                        if (label) { label += ': '; } 
+                                        if (context.parsed.y !== null) { label += context.parsed.y + '%'; }
+                                        const index = context.dataIndex; 
+                                        const ocupados = context.dataset.rawOcupados[index];
+                                        const existentes = context.dataset.rawExistentes[index];
+                                        label += ` (Ocup: ${ocupados} de ${existentes})`;
+                                        return label; 
+                                    }
+                                    return `${context.dataset.label}: ${context.parsed.y}%`;
                                 }
                             }
                         }, 
@@ -346,52 +435,39 @@
     }
 
     function loadAndRender(csvSourceText) { 
-        logContent = ''; 
-        addToLog("A ler dados CSV..."); 
+        logContent = ''; addToLog("A ler dados CSV..."); 
         Papa.parse(csvSourceText, { 
-            header: true, 
-            skipEmptyLines: true, 
-            transformHeader: header => normalizeString(header), 
+            header: true, skipEmptyLines: true, transformHeader: header => normalizeString(header), 
             complete: (results) => { 
                 addToLog("Leitura do CSV concluída."); 
-                addToLog(`\n--- CABEÇALHOS DETECTADOS (NORMALIZADOS) ---`); 
-                addToLog(JSON.stringify(results.meta.fields, null, 2)); 
                 if (results.data && results.data.length > 0) { 
-                    addToLog("\n--- PRIMEIRA LINHA DE DADOS (COMO LIDA) ---"); 
-                    addToLog(JSON.stringify(results.data[0], null, 2)); 
-                    addToLog("\n--- A PROCESSAR DADOS CSV ---"); 
                     allData = processData(results.data); 
                     if(allData.length > 0){ 
                         populateFilters(allData); 
-                        if (dateFilter.options.length > 0) dateFilter.selectedIndex = 0; 
-                        updateCharts(); 
+                        updateChartsComparative(); 
                     } else { 
-                        updateCharts(); 
+                        updateChartsComparative(); 
                     }
                 } else { 
-                    addToLog("\nERRO: Não foram encontrados dados no ficheiro ou o formato é inválido."); 
-                    alert("Não foi possível ler os dados do arquivo."); 
-                    allData = []; 
-                    updateCharts(); 
+                    alert("Não foi possível ler os dados do arquivo."); allData = []; 
+                    updateChartsComparative(); 
                 }
             }, 
             error: (error) => { 
-                addToLog(`\nERRO CRÍTICO AO LER O ARQUIVO: ${error.message}`); 
-                alert("Ocorreu um erro crítico ao tentar ler o arquivo CSV."); 
-                allData = []; 
-                updateCharts(); 
+                alert("Ocorreu um erro crítico ao tentar ler o arquivo CSV."); allData = []; 
+                updateChartsComparative(); 
             }
         });
     }
 
     // --- EVENT LISTENERS ---
-    dateFilter.addEventListener('change', updateCharts);
+    dateFilter.addEventListener('change', updateChartsComparative);
+    applyEvolutionFilter.addEventListener('click', updateChartsEvolution);
 
     // --- CARREGAMENTO INICIAL ---
     window.addEventListener('DOMContentLoaded', () => {
         createCharts();
         const csvFileName = 'Formulário sem título.csv';
-
         fetch(csvFileName)
             .then(response => {
                 if (!response.ok) {
@@ -403,10 +479,9 @@
                 loadAndRender(csvText);
             })
             .catch(error => {
-                addToLog(`ERRO CRÍTICO ao carregar o arquivo CSV '${csvFileName}': ${error.message}`);
                 console.error('Falha ao carregar o CSV:', error);
                 alert(`Não foi possível carregar os dados de '${csvFileName}'. Verifique se o arquivo está no local correto e se o nome está exato.`);
-                updateCharts();
+                updateChartsComparative();
             });
     });
 </script>
