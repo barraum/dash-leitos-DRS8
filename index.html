@@ -39,12 +39,8 @@
             <p class="text-md text-gray-600 mt-2">Comparação da ocupação das instituições para uma data específica.</p>
         </header>
 
-        <!-- MODIFICADO: Seção de Filtros agora com dois modos -->
         <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
-    
-            <!-- MODO 1: FILTRO COMPARATIVO POR DATA -->
             <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Filtrar por Data</h2>
-            <!-- <p class="text-sm text-gray-500 mb-4">Selecione uma data para comparar todas as instituições nesse dia.</p>-->
             <div>
                 <div class="w-full md:w-1/3 lg:w-1/4">
                     <select id="dateFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
@@ -53,24 +49,30 @@
                 </div>
             </div>
         
-            <!-- Divisor -->
             <hr class="my-8">
         
-            <!-- MODO 2: FILTRO EVOLUTIVO POR INSTITUIÇÃO E PERÍODO -->
             <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Evolução da ocupação</h2>
-            <!-- <p class="text-sm text-gray-500 mb-4">Selecione uma ou mais instituições e um período para ver a evolução da ocupação.</p> -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-                
-                <!-- Seletor de Instituição (Múltipla Escolha) -->
-                <div class="md:col-span-1">
+            <!-- MODIFICADO: Layout do grid ajustado para comportar o novo filtro -->
+            <div class="grid grid-cols-1 md:grid-cols-6 gap-6 items-end">
+                <div class="md:col-span-2">
                     <label for="institutionFilter" class="block mb-2 text-sm font-medium text-gray-700">Instituições (segure Ctrl para selecionar mais de uma)</label>
                     <select id="institutionFilter" multiple class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.0 h-14">
                         <option>Carregando...</option>
                     </select>
                 </div>
                 
-                <!-- Seletor de Período -->
-                <div class="md:col-span-1 grid grid-cols-2 gap-4">
+                <!-- NOVO: Filtro para Tipo de Leito -->
+                <div class="md:col-span-1">
+                    <label for="bedTypeFilter" class="block mb-2 text-sm font-medium text-gray-700">Tipo de Leito</label>
+                    <select id="bedTypeFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option value="sus" selected>SUS</option>
+                        <option value="convenio">Convênio/Particular</option>
+                        <option value="ambos">Ambos</option>
+                    </select>
+                </div>
+
+                <!-- Datas agora ocupam 2 colunas para ter mais espaço -->        
+                <div class="md:col-span-2 grid grid-cols-2 gap-4">
                     <div>
                         <label for="startDateFilter" class="block mb-2 text-sm font-medium text-gray-700">Data de Início</label>
                         <input type="date" id="startDateFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
@@ -80,8 +82,8 @@
                         <input type="date" id="endDateFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                     </div>
                 </div>
-                
-                <!-- Botão para Aplicar o Filtro -->
+
+                <!-- Botão ocupa 1 coluna -->
                 <div class="md:col-span-1">
                     <button id="applyEvolutionFilter" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg focus:outline-none focus:shadow-outline">
                         Aplicar Filtro
@@ -90,13 +92,11 @@
             </div>
         </div>
 
-        <!-- Seção de Depuração Oculta -->
         <div class="bg-white p-6 rounded-2xl shadow-lg mb-8 hidden">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">Registo de Depuração</h2>
             <textarea id="debug-log" readonly>Aguardando o carregamento do arquivo...</textarea>
         </div>
         
-        <!-- Seção dos Gráficos -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white p-6 rounded-2xl shadow-lg">
                 <h3 class="text-xl font-semibold text-gray-800 mb-3" id="title-utiAdultoChart">UTI ADULTO</h3>
@@ -214,22 +214,23 @@
         }
     ];
     const INSTITUTION_COLORS = [
-        'rgba(255, 99, 132, 0.7)',
-        'rgba(54, 162, 235, 0.7)',
-        'rgba(255, 206, 86, 0.7)',
-        'rgba(75, 192, 192, 0.7)',
-        'rgba(153, 102, 255, 0.7)',
-        'rgba(255, 159, 64, 0.7)'
+        'rgba(255, 99, 132, 1)',  // Red
+        'rgba(54, 162, 235, 1)', // Blue
+        'rgba(255, 206, 86, 1)', // Yellow
+        'rgba(75, 192, 192, 1)',  // Teal
+        'rgba(153, 102, 255, 1)',// Purple
+        'rgba(255, 159, 64, 1)' // Orange
     ];
 
     // --- ELEMENTOS DO DOM ---
     const dateFilter = document.getElementById('dateFilter');
     const debugLog = document.getElementById('debug-log');
-    // MODIFICADO: Novos elementos
     const institutionFilter = document.getElementById('institutionFilter');
     const startDateFilter = document.getElementById('startDateFilter');
     const endDateFilter = document.getElementById('endDateFilter');
     const applyEvolutionFilter = document.getElementById('applyEvolutionFilter');
+    // NOVO: Pegando o novo filtro de tipo de leito
+    const bedTypeFilter = document.getElementById('bedTypeFilter');
 
     // --- VARIÁVEIS GLOBAIS ---
     let allData = [];
@@ -245,7 +246,6 @@
     function processData(normalizedCsvData) { let rejectedCount = 0; const processed = normalizedCsvData.map((row, index) => { const rawInstitution = row[COLS.INSTITUTION]; const institution = normalizeInstitutionName(rawInstitution); const date = parseDate(row[COLS.DATE]); if (!rawInstitution || !institution) { addToLog(`--> Linha ${index + 2} REJEITADA | Instituição: "${rawInstitution}"`); rejectedCount++; return null; } if (!date) { addToLog(`--> Linha ${index + 2} REJEITADA | Data inválida: "${row[COLS.DATE]}" para "${institution}"`); rejectedCount++; return null; } const dataPoint = { institution, date, displayDate: date.toLocaleDateString('pt-BR')}; BED_TYPES_RAW_EXTRACTION.forEach(def => { let total = parseInt(row[def.col], 10) || 0; if (def.isAgregado && def.aggrKeys) { def.aggrKeys.forEach(aggrKey => { total += (parseInt(row[aggrKey], 10) || 0); }); } dataPoint[def.key] = total; }); return dataPoint; }).filter(Boolean); addToLog(`\n--- RESUMO DO PROCESSAMENTO CSV ---\nLinhas Válidas: ${processed.length}\nLinhas Rejeitadas: ${rejectedCount}`); if (processed.length === 0 && normalizedCsvData.length > 0) { alert("Nenhum dado válido foi encontrado. Verifique o Registo de Depuração."); } return processed.sort((a, b) => a.date - b.date); }
 
     // --- FUNÇÕES DE ATUALIZAÇÃO DA UI ---
-    // MODIFICADO: Agora popula todos os filtros
     function populateFilters(data) {
         const dates = [...new Set(data.map(item => item.displayDate))].sort((a,b) => parseDate(b) - parseDate(a));
         dateFilter.innerHTML = '<option value="">Selecione uma data...</option>'; 
@@ -277,22 +277,16 @@
         }
     }
     
-    // MODIFICADO: Renomeado de updateCharts para updateChartsComparative
     function updateChartsComparative() { 
         const selectedDate = dateFilter.value;
-        
-        if (selectedDate) {
-            institutionFilter.selectedIndex = -1;
-        }
-
+        if (selectedDate) { institutionFilter.selectedIndex = -1; bedTypeFilter.value = 'sus'; }
         if (!selectedDate || allData.length === 0) { 
             CHART_DEFINITIONS.forEach(def => { 
                 if (def.chartInstance) { 
                     def.chartInstance.config.type = 'bar';
-                    def.chartInstance.data.labels = []; 
-                    def.chartInstance.data.datasets = []; 
+                    def.chartInstance.data.labels = []; def.chartInstance.data.datasets = []; 
                     def.chartInstance.update(); 
-                    document.getElementById(`title-${def.canvasId}`).textContent = `${def.title} (Selecione um modo de filtro)`; 
+                    document.getElementById(`title-${def.canvasId}`).textContent = `${def.title}`; 
                 }
             }); 
             return; 
@@ -311,17 +305,16 @@
                     partOcup = instData[chartDef.partOcupKey] || 0; partExist = instData[chartDef.partExistKey] || 0;
                     susRate = calculateRate(susOcup, susExist); partRate = calculateRate(partOcup, partExist);
                 }
+                const color = INSTITUTION_COLORS[index % INSTITUTION_COLORS.length].replace('1)', '0.7)');
                 return { 
                     label: instName, data: [susRate, partRate], 
                     rawOcupados: [susOcup, partOcup], rawExistentes: [susExist, partExist],
-                    backgroundColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length], 
-                    borderColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length].replace('0.7', '1'), 
-                    borderWidth: 1 
+                    backgroundColor: color, borderColor: color.replace('0.7', '1'), borderWidth: 1 
                 }; 
             }); 
             
             if (chartDef.chartInstance) { 
-                chartDef.chartInstance.config.type = 'bar'; // Garante tipo BARRA
+                chartDef.chartInstance.config.type = 'bar';
                 chartDef.chartInstance.data.labels = ['SUS', 'Convênio/Particular']; 
                 chartDef.chartInstance.data.datasets = datasets; 
                 chartDef.chartInstance.options.scales.x.title.text = 'Tipo de Leito';
@@ -330,9 +323,10 @@
         });
     }
 
-    // NOVO: Função para o modo de evolução
+    // MODIFICADO: Lógica central para filtrar por tipo de leito
     function updateChartsEvolution() {
         const selectedInstitutions = Array.from(institutionFilter.selectedOptions).map(option => option.value);
+        const selectedBedType = bedTypeFilter.value; // Pega o valor do novo filtro
         const startDate = startDateFilter.valueAsDate;
         const endDate = endDateFilter.valueAsDate;
 
@@ -361,27 +355,47 @@
         CHART_DEFINITIONS.forEach(chartDef => {
             document.getElementById(`title-${chartDef.canvasId}`).textContent = `${chartDef.title} - Evolução`;
             
-            const datasets = selectedInstitutions.map((instName, index) => {
+            const datasets = selectedInstitutions.flatMap((instName, index) => {
                 const dataForInstitution = filteredData.filter(d => d.institution === instName);
-                const dataPoints = labels.map(labelDate => {
-                    const dayData = dataForInstitution.find(d => d.displayDate === labelDate);
-                    if (!dayData) return null;
-                    const totalOcup = (dayData[chartDef.susOcupKey] || 0) + (dayData[chartDef.partOcupKey] || 0);
-                    const totalExist = (dayData[chartDef.susExistKey] || 0) + (dayData[chartDef.partExistKey] || 0);
-                    return calculateRate(totalOcup, totalExist);
-                });
+                const datasetsForInst = [];
 
-                return {
-                    label: getShortInstitutionName(instName),
-                    data: dataPoints,
-                    borderColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length],
-                    backgroundColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length].replace('0.7', '0.2'),
-                    fill: false, tension: 0.1, spanGaps: true,
-                };
+                // Condicional para criar o dataset de SUS
+                if (selectedBedType === 'sus' || selectedBedType === 'ambos') {
+                    const susDataPoints = labels.map(labelDate => {
+                        const dayData = dataForInstitution.find(d => d.displayDate === labelDate);
+                        return dayData ? calculateRate(dayData[chartDef.susOcupKey], dayData[chartDef.susExistKey]) : null;
+                    });
+                    datasetsForInst.push({
+                        label: `${getShortInstitutionName(instName)} - SUS`,
+                        data: susDataPoints,
+                        borderColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length],
+                        backgroundColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length].replace('1)', '0.2)'),
+                        fill: false, tension: 0.1, spanGaps: true,
+                        borderDash: [] // Linha sólida
+                    });
+                }
+
+                // Condicional para criar o dataset de Convênio
+                if (selectedBedType === 'convenio' || selectedBedType === 'ambos') {
+                    const partDataPoints = labels.map(labelDate => {
+                        const dayData = dataForInstitution.find(d => d.displayDate === labelDate);
+                        return dayData ? calculateRate(dayData[chartDef.partOcupKey], dayData[chartDef.partExistKey]) : null;
+                    });
+                    datasetsForInst.push({
+                        label: `${getShortInstitutionName(instName)} - Convênio`,
+                        data: partDataPoints,
+                        borderColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length],
+                        backgroundColor: INSTITUTION_COLORS[index % INSTITUTION_COLORS.length].replace('1)', '0.2)'),
+                        borderDash: [5, 5], // Linha tracejada
+                        fill: false, tension: 0.1, spanGaps: true,
+                    });
+                }
+                
+                return datasetsForInst;
             });
 
             if (chartDef.chartInstance) {
-                chartDef.chartInstance.config.type = 'line'; // Muda para tipo LINHA
+                chartDef.chartInstance.config.type = 'line';
                 chartDef.chartInstance.data.labels = labels;
                 chartDef.chartInstance.data.datasets = datasets;
                 chartDef.chartInstance.options.scales.x.title.text = 'Data';
